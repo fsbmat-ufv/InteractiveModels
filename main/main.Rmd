@@ -1,0 +1,1678 @@
+---
+title: "Material Didático Interativo para o Ensino e Aprendizado de Distribuições de Probabilidade"
+subtitle: "Trabalho de Conclusão de Curso"
+encoding: "UTF-8"
+output: 
+  learnr::tutorial:
+    theme: yeti
+    highlight: haddock
+    toc: true
+    toc_float:
+      collapsed: true
+    number_sections: false
+    language: 
+      pt: 
+        button: 
+          submitanswer: "Avaliar Resposta"
+    progressive: true
+    allow_skip: true
+    css: 
+      - css/cssScript.css
+author:
+  - name: "Darah Aparecida Pires Moreira (Graduanda em Matemática)"
+    email: https://www.overleaf.com/read/gfqzqtndvngp#f67c47
+    affiliation: Universidade Federal de Viçosa
+  - name: "Fernando Bastos, Professor do Departamento de Estatística"
+    email: https://fsbmat-ufv.github.io
+runtime: shiny_prerendered
+---
+
+```{r setup, include=FALSE}
+library(learnr)
+library(kableExtra)
+library(fontawesome)
+library(tidyverse)
+knitr::opts_chunk$set(echo = T, warning = F, fig.align = "center", message = F,
+                      error = F)
+```
+
+## Distribuição Uniforme Discreta
+
+<p style="text-align: justify;">
+A **Distribuição Uniforme Discreta** descreve uma variável aleatória que assume valores inteiros igualmente prováveis em um intervalo finito. Seja $X$ uma variável aleatória com valores possíveis $a, a + 1, a + 2, \ldots , b − 1, b,$ para $a < b,$ então a função de probabilidade é dada por:
+</p>
+
+$$
+P(X = x) = \frac{1}{n}, ~ \text{com}~ x \in \{a, a + 1, a + 2, \ldots , b − 1, b\}~\text{e}~n = b - a + 1.
+$$
+
+<p style="text-align: justify;">
+A formulação matemática da distribuição uniforme discreta foi desenvolvida como uma generalização da ideia de probabilidade igual para eventos mutuamente exclusivos, sendo amplamente difundida em trabalhos iniciais de probabilidade por Pierre-Simon Laplace (1749–1827).
+</p>
+
+&#10003; Parâmetros
+
+- $a$: menor valor do intervalo.
+- $b$: maior valor do intervalo.
+- $n = b - a + 1$: número total de valores possíveis.
+
+
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = \frac{a + b}{2}$.
+- Variância: $\text{Var}(X) = \frac{(b - a + 1)^2 - 1}{12}$.
+
+
+
+&#10003; Principais Aplicações
+
+- <p style="text-align: justify;">Modelagem de eventos em que todos os resultados possíveis têm a mesma probabilidade de ocorrer, como o lançamento de um dado justo.</p>
+- Simulação computacional para gerar números inteiros aleatórios em um intervalo específico.
+- Estudos iniciais de probabilidade e experimentos aleatórios simples.
+
+
+
+### Representações Gráficas
+
+```{r uniformeDisc1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definição da função massa de probabilidade da distribuição uniforme discreta
+massa_uniforme <- function(x, k) {
+  ifelse(x %in% 1:k, 1 / k, 0)
+}
+
+# Definição dos valores possíveis de X
+k <- 10
+valores_x <- 1:k
+
+data <- data.frame(x = valores_x,
+                   probabilidade = massa_uniforme(valores_x, k))
+
+p <- ggplot(data, aes(x = x, y = probabilidade)) +
+  geom_point(size = 3, color = "blue") +
+  geom_segment(aes(xend = x, yend = 0), linewidth = 1, color = "blue") +
+  labs(title = as.expression(bquote(X %~% Uniforme(k == .(k)))),
+       x = "x",
+       y = "Probabilidade") +
+  theme_minimal()
+
+print(p)
+
+```
+
+```{r, echo=FALSE}
+sliderInput("ValorK", "Número de Valores Distintos", min = 1, max = 20, value = 5)
+plotOutput("distPlotUniformDisc")
+```
+
+```{r, context="server"}
+output$distPlotUniformDisc <- renderPlot({
+# Definição da função massa de probabilidade da distribuição uniforme discreta
+massa_uniforme <- function(x, k) {
+  ifelse(x %in% 1:k, 1 / k, 0)
+}
+
+# Definição dos valores possíveis de X
+k <- input$ValorK
+valores_x <- 1:k
+
+data <- data.frame(x = valores_x,
+                   probabilidade = massa_uniforme(valores_x, k))
+
+p <- ggplot(data, aes(x = x, y = probabilidade)) +
+  geom_point(size = 3, color = "blue") +
+  geom_segment(aes(xend = x, yend = 0), linewidth = 1, color = "blue") +
+  labs(title = as.expression(bquote(X %~% Uniforme(k == .(k)))),
+       x = "x",
+       y = "Probabilidade") +
+  ylim(0,1) +
+  theme_minimal()
+
+print(p)
+})
+```
+
+## Distribuição Bernoulli
+
+<p style="text-align: justify;">
+A **Distribuição de Bernoulli** descreve uma variável aleatória que assume apenas dois possíveis valores, geralmente representados por $1$ (sucesso) e $0$ (fracasso), com probabilidades complementares. Seja $X$ uma variável aleatória com esta distribuição, então sua função de probabilidade é dada por:
+</p>
+
+\[
+P(X = x) = 
+\begin{cases} 
+p, & \text{se } x = 1, \\
+1-p, & \text{se } x = 0,
+\end{cases}
+\]
+
+em que $p \in [0, 1]$ é a probabilidade de sucesso.
+
+<p style="text-align: justify;">
+A distribuição de Bernoulli foi introduzida e estudada pelo matemático suíço Jacob Bernoulli (1655–1705), um dos pioneiros no estudo das probabilidades, em sua obra \textit{Ars Conjectandi}. Para maiores informações sugerimos \citet{forbes2011statistical}.
+</p>
+
+&#10003; Parâmetros
+
+
+- $p$: probabilidade de sucesso ($0 \leq p \leq 1$).
+
+
+&#10003; Estatísticas Importantes
+
+
+- Esperança: $\mathbb{E}[X] = p$.
+- Variância: $\text{Var}(X) = p(1-p)$.
+
+
+
+&#10003; Principais Aplicações
+
+
+
+- Modelagem de experimentos binários, como o lançamento de uma moeda justa ou viciada.
+- <p style="text-align: justify;"> Análise de eventos dicotômicos em estudos estatísticos, como sucesso/fracasso ou presença/ausência de um atributo.</p>
+- Base teórica para distribuições mais complexas, como a binomial e a binomial negativa.
+
+
+### Representações Gráficas
+
+```{r bernoulli, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definindo os parâmetros da distribuição Bernoulli
+sucessos <- c(0, 1)  # A distribuição Bernoulli assume apenas 0 e 1 como possíveis valores
+prob <- 0.4  # Probabilidade de sucesso
+
+# Calculando a probabilidade para os sucessos
+probabilidade <- dbinom(x = sucessos, size = 1, prob = prob)
+
+# Criando o gráfico no estilo "espeto"
+df <- data.frame(sucessos, prob = probabilidade)
+
+ggplot(df, aes(x = sucessos, y = prob)) +
+  geom_segment(aes(xend = sucessos, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 4, color = "blue") +
+  geom_text(aes(label = round(prob, 2), y = prob + 0.02), size = 4, vjust = 0) +
+  scale_x_continuous(breaks = sucessos) +
+  labs(title = "Distribuição Bernoulli",
+       subtitle = bquote("Bernoulli"~"(p ="~ .(prob)~")"),
+       x = "Valor de X",
+       y = "Probabilidade") +
+  theme_minimal()
+```
+
+```{r, echo=FALSE}
+sliderInput("prob", "Probabilidade de sucesso (p):", min = 0, max = 1, value = 0.43, step = 0.01)
+plotOutput("distPlotBernoulli")
+```
+
+```{r, context="server"}
+output$distPlotBernoulli <- renderPlot({
+  # Definindo os valores de X e suas probabilidades
+x <- c(0, 1)  # Possíveis resultados: falha (0) e sucesso (1)
+prob <- c(1 - input$prob, input$prob)  # Probabilidades correspondentes
+
+# Criando o data frame
+data <- data.frame(x, prob)
+
+# Criando o gráfico com ggplot2 (gráfico de espeto)
+ggplot(data, aes(x = x, y = prob)) +
+  geom_segment(aes(xend = x, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 4, color = "blue") +
+  geom_text(aes(label = round(prob, 2), y = prob + 0.02), size = 4, vjust = 0) +
+  scale_x_continuous(breaks = x) +
+  labs(
+    title = "Distribuição Bernoulli",
+    subtitle = paste("Distribuição Bernoulli (p =", input$prob, ")"),
+    x = "Resultados (x)",
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+})
+```
+
+## Distribuição Binomial
+
+<p style="text-align: justify;">
+A **Distribuição Binomial** descreve o número de sucessos em $n$ ensaios independentes de Bernoulli, cada um com probabilidade de sucesso $p$. Seja $X$ uma variável aleatória que segue essa distribuição, sua função de probabilidade é dada por:
+</p>
+
+\[
+P(X = k) = \binom{n}{k} p^k (1-p)^{n-k}, \quad k = 0, 1, \ldots, n,
+\]
+
+\begin{center}
+onde $\binom{n}{k} = \frac{n!}{k!(n-k)!}$ é o coeficiente binomial. 
+\end{center}
+
+<p style="text-align: justify;">
+A formulação matemática da distribuição binomial foi inicialmente explorada por Jakob Bernoulli (1655–1705) em \textit{Ars Conjectandi} e posteriormente formalizada com base nos trabalhos de Abraham de Moivre (1667–1754). Para maiores informações sugerimos \citet{edwards1960meaning} e \citet{forbes2011statistical}.
+</p>
+
+&#10003; Parâmetros
+
+- $n$: número de ensaios de Bernoulli (inteiro positivo).
+- $p$: probabilidade de sucesso em cada ensaio ($0 \leq p \leq 1$).
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = np$.
+- Variância: $\text{Var}(X) = np(1-p)$.
+
+&#10003; Principais Aplicações
+
+- <p style="text-align: justify;"> Modelagem de contagem de sucessos em experimentos repetidos, como o número de caras em $n$ lançamentos de uma moeda.</p>
+- Estudos estatísticos envolvendo amostras aleatórias e proporções populacionais.
+- Modelagem de eventos binários em séries temporais ou experimentos laboratoriais.
+
+
+### Representações Gráficas
+
+```{r bin1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definição dos parâmetros
+n <- 15  # Número de tentativas
+prob <- 0.4  # Probabilidade de sucesso
+sucessos <- 0:n  # Possíveis valores de sucessos
+
+# Calculando a distribuição binomial
+probabilidade <- dbinom(x = sucessos, size = n, prob = prob)
+
+# Criando o data frame
+df <- data.frame(sucessos, prob = probabilidade)
+
+# Criando o gráfico de espeto com ggplot2
+ggplot(df, aes(x = sucessos, y = prob)) +
+  geom_segment(aes(xend = sucessos, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(aes(label = round(prob, 3), y = prob + 0.015), size = 3, vjust = 0) +
+  scale_x_continuous(breaks = sucessos) +
+  labs(title = "Distribuição Binomial",
+       subtitle = bquote("Binomial"~"(n"== .(n)~","~ "p"== .(prob)~")"),
+       x = "Número de Sucessos (x)",
+       y = "Probabilidade") +
+  theme_minimal() 
+```
+
+-----
+
+<p style="text-align: justify;">
+Abaixo segue o somatório das probabilidades para todo o número de sucessos possíveis.
+</p>
+
+```{r bin2, exercise=TRUE, exercise.eval=TRUE}
+n <- 15
+sucessos <- 0:n
+probabilidade <- dbinom(x=sucessos,   # Quantidade de sucessos
+                        size = n,  # Quantidade de lançamentos
+                        prob=0.5)  # Probabilidade a priori de sucesso
+sum(probabilidade)
+```
+
+```{r, echo=FALSE}
+sliderInput("Num", "Número de Experimentos N:" , min = 1  , max = 100, value = 15)
+sliderInput("prob", "Valor de p:", min = 0, max = 1, value = 0.5)
+plotOutput("distPlotBin")
+```
+
+```{r, context="server"}
+output$distPlotBin <- renderPlot({
+  # Definição dos parâmetros da distribuição binomial no Shiny
+sucessos <- 0:input$Num  # Valores possíveis de sucessos
+size  <- input$Num       # Número total de tentativas
+prob <- input$prob       # Probabilidade de sucesso
+media <- input$Num*input$prob
+Var <- input$Num*input$prob*(1-input$prob)
+
+# Calculando a distribuição binomial
+probabilidade <- dbinom(x = sucessos, size = size, prob = prob)
+
+# Criando o data frame
+df <- data.frame(sucessos, prob = probabilidade)
+
+# Criando o gráfico de espeto com ggplot2
+ggplot(df, aes(x = sucessos, y = prob)) +
+  geom_segment(aes(xend = sucessos, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(aes(label = round(prob, 3), y = prob + 0.015), size = 3, vjust = 0) +
+  scale_x_continuous(breaks = sucessos) +
+  labs(title = bquote("Distribuição Binomial com Média"~"E(X)="~.(media)~"e Variância"~"VAR(X)="~.(Var)),
+       subtitle = paste("Binomial (n =", input$Num, ", p =", input$prob, ")"),
+       x = "Número de Sucessos (x)",
+       y = "Probabilidade") +
+  theme_minimal()
+})
+```
+
+
+<p style="text-align: justify;">
+À medida que o valor de $n$ aumenta, os resultados tendem a se aproximar da média, reduzindo a variância. Como consequência, as probabilidades se aproximam mais da realidade.
+</p>
+
+## Distribuição Poisson
+
+<p style="text-align: justify;">
+A **Distribuição de Poisson** descreve o número de ocorrências de um evento em um intervalo fixo de tempo ou espaço, dado que as ocorrências são independentes e acontecem a uma taxa constante. Para maiores informações sugerimos \citet{forbes2011statistical}. Seja $X$ uma variável aleatória com distribuição de Poisson. A distribuição de Poisson foi nomeada em homenagem ao matemático francês Siméon-Denis Poisson (1781–1840), que a utilizou em seus estudos sobre probabilidade no contexto de julgamentos e eventos raros. Sua função de probabilidade é dada por:
+</p>
+
+\[
+P(X = k) = \frac{\lambda^k e^{-\lambda}}{k!}, \quad k = 0, 1, 2, \ldots,
+\]
+onde $\lambda > 0$ é o parâmetro que representa a taxa média de ocorrências por unidade de tempo ou espaço.
+
+
+&#10003; Parâmetros
+
+- $\lambda$: taxa média de ocorrências por unidade de tempo ou espaço (real positivo).
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = \lambda$.
+- Variância: $\text{Var}(X) = \lambda$.
+
+&#10003; Principais Aplicações
+
+- <p style="text-align: justify;"> Modelagem de eventos raros, como o número de chamadas recebidas por uma central telefônica em um intervalo de tempo.</p>
+-<p style="text-align: justify;">  Estudos envolvendo contagem de ocorrências em áreas como biologia (mutação genética) e física (contagem de partículas radioativas).</p>
+- Análise de padrões de eventos espaciais ou temporais em processos estocásticos.
+
+ 
+### Representações Gráficas 
+
+```{r poisson1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definindo os parâmetros da distribuição Poisson
+lambda <- 8  # Taxa média de eventos
+n <- 15  # Limite superior dos sucessos considerados
+sucessos <- 0:n  # Possíveis valores de sucessos
+
+# Calculando a distribuição Poisson
+probabilidade <- dpois(x = sucessos, lambda = lambda)
+
+# Criando o data frame
+df <- data.frame(sucessos, prob = probabilidade)
+
+# Criando o gráfico de espeto com ggplot2
+ggplot(df, aes(x = sucessos, y = prob)) +
+  geom_segment(aes(xend = sucessos, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(aes(label = round(prob, 3), y = prob + 0.015), size = 3, vjust = 0) +
+  scale_x_continuous(breaks = sucessos) +
+  labs(title = bquote("Distribuição de Poisson com Média e Variância"~lambda==.(lambda)),
+       subtitle = bquote("Poisson("~lambda==.(lambda)~")"),
+       x = "Número de Ocorrências (x)",
+       y = "Probabilidade") +
+  theme_minimal()
+```
+
+```{r, echo=FALSE}
+sliderInput("lambda", "Média/Taxa esperada (\u03BB):", min = 0.1, max = 20, value = 5, step = 0.1)
+sliderInput("max_events", "Número máximo de eventos (k):", min = 1, max = 50, value = 20, step = 1)
+plotOutput("distPlotPoisson")
+```
+
+```{r, context="server"}
+output$distPlotPoisson <- renderPlot({
+# Definindo os valores de k e calculando as probabilidades
+eventos <- 0:input$max_events
+probabilidade <- dpois(x = eventos, lambda = input$lambda)
+
+# Criando o data frame
+df <- data.frame(eventos, prob = probabilidade)
+
+# Criando o gráfico de espeto
+ggplot(df, aes(x = eventos, y = prob)) +
+  geom_segment(aes(xend = eventos, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(
+    aes(label = round(prob, 3), y = prob + 0.015),
+    size = 3,
+    vjust = 0
+  ) +
+  scale_x_continuous(breaks = eventos) +
+  labs(
+    title = bquote("Distribuição de Poisson com Média e Variância"~lambda==.(input$lambda)),
+    subtitle = bquote("Poisson("~lambda==.(input$lambda)~")"),
+    x = "Número de eventos (k)",
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+
+  })
+```
+
+## Distribuição Geométrica
+
+<p style="text-align: justify;">
+A **Distribuição Geométrica** descreve o número de ensaios necessários até a ocorrência do primeiro sucesso em um experimento de Bernoulli repetido. Seja $X$ uma variável aleatória com esta distribuição. A distribuição geométrica foi estudada no contexto de processos binários por Jakob Bernoulli (1655–1705), sendo amplamente utilizada em teoria de probabilidades e estatística aplicada. Sua função de probabilidade é dada por:
+</p>
+
+\[
+P(X = k) = (1-p)^{k-1} p, \quad k = 1, 2, 3, \ldots,
+\]
+onde $p \in (0, 1]$ é a probabilidade de sucesso em cada ensaio.
+
+
+&#10003; Parâmetros
+
+- $p$: probabilidade de sucesso em cada ensaio ($0 < p \leq 1$).
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = \frac{1}{p}$.
+- Variância: $\text{Var}(X) = \frac{1-p}{p^2}$.
+
+&#10003; Principais Aplicações
+
+- <p style="text-align: justify;"> Modelagem de processos que envolvem a contagem do número de tentativas até o primeiro sucesso, como o número de lançamentos de um dado até que uma face específica apareça.</p>
+- <p style="text-align: justify;"> Análise de falhas em sistemas, determinando o número de testes necessários até que um produto funcione corretamente.</p>
+- Processos estocásticos que envolvem eventos discretos com probabilidades constantes.
+
+
+### Representações Gráficas
+
+```{r geometrica1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definindo os parâmetros da distribuição Geométrica
+prob <- 0.3        # Probabilidade de sucesso em cada tentativa
+tentativas <- 0:15 # Número de tentativas até o primeiro sucesso
+
+# Calculando a probabilidade usando a distribuição geométrica
+probabilidade <- dgeom(x = tentativas, prob = prob)
+
+# Criando o data frame
+df <- data.frame(tentativas, prob = probabilidade)
+
+# Criando o gráfico de espeto
+ggplot(df, aes(x = tentativas, y = prob)) +
+  geom_segment(aes(xend = tentativas, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(
+    aes(label = round(prob, 3), y = prob + 0.015),
+    size = 3,
+    vjust = 0
+  ) +
+  scale_x_continuous(breaks = tentativas) +
+  labs(
+    title = "Distribuição Geométrica",
+    subtitle = bquote("Geométrica(p="~.(prob)~")"),
+    x = "Tentativas até o primeiro sucesso (x)",
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+```
+
+```{r, echo=FALSE}
+sliderInput("prob", "Probabilidade de sucesso (p):", min = 0.01, max = 1, value = 0.5, step = 0.01)
+sliderInput("max_trials", "Número máximo de tentativas (k):", min = 1, max = 50, value = 15, step = 1)
+plotOutput("distPlotGeom")
+```
+
+```{r, context="server"}
+output$distPlotGeom <- renderPlot({
+    # Definindo os valores de tentativas e calculando probabilidades
+tentativas <- 0:input$max_trials
+probabilidade <- dgeom(x = tentativas, prob = input$prob)
+media <- 1 / input$prob
+Var <- (1 - input$prob) / (input$prob^2)
+
+# Criando o data frame
+df <- data.frame(tentativas, prob = probabilidade)
+
+# Criando o gráfico de espeto
+ggplot(df, aes(x = tentativas, y = prob)) +
+  geom_segment(aes(xend = tentativas, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(
+    aes(label = round(prob, 3), y = prob + 0.015),
+    size = 3,
+    vjust = 0
+  ) +
+  scale_x_continuous(breaks = tentativas) +
+  labs(
+    title = bquote("Distribuição Geométrica com Média"~E(X)==.(round(media, 2))~"e Variância"~VAR(X)==.(round(Var, 2))),
+    subtitle = paste("Geométrica (p =", input$prob, ")"),
+    x = "Número de falhas antes do primeiro sucesso",
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+
+  })
+```
+
+## Distribuição Binomial Negativa
+
+<p style="text-align: justify;">
+A **Distribuição Binomial Negativa** é uma distribuição discreta que modela o número de falhas $(X)$ necessárias para alcançar um número fixo de sucessos $(k)$ em experimentos de Bernoulli independentes, onde cada tentativa tem uma probabilidade constante de sucesso $(p)$. Embora o conceito tenha origens nas investigações sobre probabilidades acumulativas por Jacob Bernoulli no século XVII, a formalização completa da distribuição binomial negativa foi desenvolvida no contexto da teoria das distribuições e aplicada no século XX. A função de probabilidade é:
+</p>
+
+\[
+P(X=x)= \binom{x+k-1}{k-1}p^k(1-p)^x, x=0,1,2 \cdots
+\]
+
+&#10003; Parâmetros
+
+- $k:$ Número de sucessos 
+- $p:$ Probabilidade de sucesso em cada tentativa
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X]=\frac{k(1-p)}{p}$
+- Variância: $\text{Var(X)}=\frac{k(1-p)}{p^2}$
+
+&#10003; Principais Aplicações
+
+- Determina número de tentativas até alcançar um certo número de sucessos
+- O número de falhas em um sistema antes que ele alcance alguns reparos bem-sucedidos.
+
+### Representações Gráficas
+
+```{r bineg1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definindo os parâmetros da distribuição Binomial Negativa
+n_sucessos <- 10  # Número de sucessos desejados
+prob <- 0.5        # Probabilidade de sucesso em cada tentativa
+falhas <- 0:15     # Número de falhas até alcançar o n_sucessos
+
+# Calculando a probabilidade usando a distribuição binomial negativa
+probabilidade <- dnbinom(x = falhas, size = n_sucessos, prob = prob)
+
+# Criando o data frame
+df <- data.frame(falhas, prob = probabilidade)
+
+# Criando o gráfico de espeto
+ggplot(df, aes(x = falhas, y = prob)) +
+  geom_segment(aes(xend = falhas, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(
+    aes(label = round(prob, 3), y = prob + 0.015),
+    size = 3,
+    vjust = 0
+  ) +
+  scale_x_continuous(breaks = falhas) +
+  labs(
+    title = "Distribuição Binomial Negativa",
+    subtitle = bquote("BN(k="~.(n_sucessos)~", p="~.(prob)~")"),
+    x = bquote("Número de falhas (x) até a obtenção de"~k==.(n_sucessos)~"sucessos"),
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+``` 
+
+```{r, echo=FALSE}
+sliderInput("n_sucessos", "Número de sucessos desejados (k):", min = 1, max = 20, value = 10)
+sliderInput("prob", "Probabilidade de sucesso em cada tentativa (p):", min = 0.1, max = 0.9, value = 0.5, step = 0.01)
+sliderInput("max_falhas", "Número máximo de falhas (x):", min = 10, max = 50, value = 15)
+plotOutput("distPlotNegBin")
+```
+
+
+```{r, context="server"}
+output$distPlotNegBin <- renderPlot({
+  # Definindo os parâmetros da distribuição Binomial Negativa
+n_sucessos <- input$n_sucessos  # Número de sucessos desejados
+prob <- input$prob               # Probabilidade de sucesso
+falhas <- 0:input$max_falhas     # Número de falhas até alcançar os sucessos
+
+# Calculando a média e variância
+media <- (n_sucessos * (1 - prob)) / prob
+variancia <- (n_sucessos * (1 - prob)) / (prob^2)
+
+# Calculando as probabilidades usando dnbinom
+probabilidade <- dnbinom(
+  x = falhas,       # Número de falhas
+  size = n_sucessos, # Número de sucessos desejados
+  prob = prob        # Probabilidade de sucesso em cada tentativa
+)
+
+# Criando o data frame
+df <- data.frame(falhas, prob = probabilidade)
+
+# Criando o gráfico de espeto
+ggplot(df, aes(x = falhas, y = prob)) +
+  geom_segment(aes(xend = falhas, yend = 0), linetype = "solid", color = "skyblue", size = 1) +
+  geom_point(size = 3, color = "blue") +
+  geom_text(
+    aes(label = round(prob, 3), y = prob + 0.015),
+    size = 3,
+    vjust = 0
+  ) +
+  scale_x_continuous(breaks = falhas) +
+  labs(
+    title = bquote("Distribuição Binomial Negativa com Média"~E(X)==.(round(media, 2))~"e Variância"~VAR(X)==.(round(variancia, 2))),
+    subtitle = bquote("BN("~k==.(n_sucessos)~","~p==.(prob)~")"),
+    x = bquote("Número de falhas (x) até a obtenção de"~k==.(n_sucessos)~"sucessos"),
+    y = "Probabilidade"
+  ) +
+  theme_minimal()
+
+})
+```
+
+## Distribuição Uniforme Contínua
+
+<p style="text-align: justify;"> 
+A **Distribuição Uniforme Contínua** descreve uma variável aleatória contínua cuja densidade de probabilidade é constante em um intervalo finito. Seja $X$ uma variável aleatória com suporte no intervalo $[a, b]$, para $a < b$, então sua função densidade de probabilidade é dada por:
+</p>
+
+\[
+f(x) =
+\begin{cases}
+\frac{1}{b - a}, & \text{se } a \leq x \leq b, \\
+0, & \text{caso contrário}.
+\end{cases}
+\]
+
+<p style="text-align: justify;"> 
+A distribuição uniforme contínua é uma das distribuições mais simples e fundamentais em estatística. Seu uso remonta aos primeiros estudos de probabilidade, sendo amplamente empregada na modelagem de incertezas e geração de números aleatórios. A suposição de equiprobabilidade para qualquer subintervalo de mesmo comprimento dentro de $[a, b]$ a torna útil em diversas aplicações teóricas e práticas.
+</p>
+
+&#10003; Parâmetros
+
+- $a$: limite inferior do intervalo.
+- $b$: limite superior do intervalo.
+
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = \frac{a + b}{2}$.
+- Variância: $\text{Var}(X) = \frac{(b - a)^2}{12}$.
+
+&#10003; Principais Aplicações
+
+- Geração de números aleatórios contínuos em simulações computacionais.
+- Modelagem de fenômenos físicos e naturais onde cada valor dentro de um intervalo tem a mesma chance de ocorrer.
+- Métodos estatísticos e computacionais, como a técnica de amostragem de Monte Carlo.
+
+
+### Representações Gráficas
+
+```{r uniforme1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Definição da função densidade da distribuição uniforme
+densidade_uniforme <- function(x, min, max) {
+  ifelse(x >= min & x <= max, 1 / (max - min), 0)
+}
+
+data <- data.frame(x = rep(seq(-5, 15, by = 0.01), 5),
+                   min = rep(c(-4, 1, -2, 5, 2), each = length(seq(-5, 15, by = 0.01))),
+                   max = rep(c(-1.2, 3, 6, 9, 7), each = length(seq(-5, 15, by = 0.01))))
+
+data$density <- with(data, densidade_uniforme(x, min, max))
+
+data$group <- factor(paste0("Uniforme(", data$min, ", ", data$max, ")"))
+
+colors <- c("blue", "red", "green", "purple", "orange")
+
+p <- ggplot(data, aes(x = x, y = density, color = group, linetype = group)) +
+  geom_line(linewidth = 1) +
+  scale_color_manual(values = colors) +
+  labs(title = expression(X %~% Uniforme(a, b)),
+       x = "x",
+       y = "Densidade") +
+  theme_minimal() +
+  theme(legend.title = element_blank())
+
+print(p)
+
+```
+
+```{r, echo=FALSE}
+sliderInput("minValue", "Valor Mínimo (a):", min = -5, max = 5, value = 0)
+sliderInput("maxValue", "Valor Máximo (b):", min = 0, max = 15, value = 5)
+sliderInput("legendPos", "Posição da Legenda no eixo x:", min = -5, max = 10, value = 7)
+plotOutput("distPlotUniform")
+```
+
+```{r, context="server"}
+output$distPlotUniform <- renderPlot({
+  # Valores de x para o gráfico
+  # Criando a sequência de valores para x
+x <- seq(-5, 15, by = 0.01)
+
+# Parâmetros ajustáveis
+min_val <- input$minValue
+max_val <- input$maxValue
+
+# Criando um data frame com os valores da densidade da distribuição Uniforme
+df <- data.frame(
+  x = x,
+  density = dunif(x, min = min_val, max = max_val)
+)
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density)) +
+  geom_line(color = "blue", size = 1.2) +  # Linha azul mais espessa
+  labs(
+    title = bquote("X~Uniforme"~"(a"== .(min_val)~","~"b"==.(max_val)~ ")"),
+    x = "x",
+    y = "Densidade"
+  ) +
+  theme_minimal() +  # Estilo minimalista para o gráfico
+  ylim(0, 1) +  # Ajuste do eixo y
+  annotate(
+    "text",
+    x = input$legendPos, 
+    y = 0.5, 
+    label = as.expression(bquote("X~Uniforme"(a == .(min_val), b == .(max_val)))),
+    color = "blue",
+    size = 5
+  )  # Adicionando legenda diretamente no gráfico
+})
+```
+
+## Distribuição Normal
+
+<p style="text-align: justify;">
+A **Distribuição Normal**, também conhecida como distribuição Gaussiana, é uma distribuição contínua que modela variáveis aleatórias cuja probabilidade se distribui simetricamente em torno da média, formando a clássica curva em formato de sino. A função densidade de probabilidade é dada por:
+</p>
+
+\[
+f(x) = \frac{1}{\sqrt{2\pi\sigma^2}} \exp\left(-\frac{(x-\mu)^2}{2\sigma^2}\right), \quad x \in \mathbb{R},
+\]
+onde $\mu$ é a média e $\sigma^2$ é a variância.
+
+<p style="text-align: justify;">
+A distribuição normal foi descrita matematicamente por Carl Friedrich Gauss (1777–1855), que a utilizou no estudo de erros de medição, embora Abraham de Moivre (1667–1754), matemático francês, tenha sido o primeiro a introduzir a curva em um contexto probabilístico. Moivre notou que à medida que se aumentava o número de eventos de um experimento, a Distribuição Binomial se aproximava de uma curva suave. A partir daí, o francês Pierre Simon de Laplace (1748 – 1827) estendeu os resultados e formalizou essa ideia como parte do Teorema de Moivre-Laplace e utilizou a distribuição com o intuito de analisar erros experimentais e assim contribuiu com o desenvolvimento da Teoria das Probabilidades. Maiores informações sugere-se \citet{bittencourt_viali_2006, salsburg2024senhora}.
+</p>
+
+&#10003; Parâmetros
+
+- $\mu$: média (localização da curva).
+- $\sigma^2$: variância (dispersão da curva).
+
+&#10003; Estatísticas Importantes
+
+- Esperança: $\mathbb{E}[X] = \mu$.
+- Variância: $\text{Var}(X) = \sigma^2$.
+
+&#10003; Principais Aplicações
+
+- <p style="text-align: justify;"> Modelagem de fenômenos naturais e sociais, como altura, peso, e desempenho acadêmico, que frequentemente seguem uma distribuição aproximadamente normal.</p>
+- Base teórica para testes estatísticos, como o teste $t$ de Student e a análise de regressão.
+- Aproximação de outras distribuições (teorema central do limite), especialmente em grandes amostras.
+
+
+### Representações Gráfica
+
+```{r norm1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função para calcular a densidade da normal
+normal <- function(x, mu, sigma) {
+  dnorm(x, mu, sigma)
+}
+
+# Definição do intervalo de x
+x <- seq(-10, 10, by = 0.01)
+
+# Parâmetros das distribuições
+mus <- c(1, 1.5, 2, 2.5, 3, 3.5)  # Valores de média
+sigma <- 2  # Desvio padrão
+var <- sigma^2  # Variância
+
+# Criando o data frame para ggplot
+df <- expand.grid(x = x, mu = mus) %>%
+  mutate(densidade = normal(x, mu, sigma))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = densidade, color = factor(mu), linetype = factor(mu))) +
+  geom_line(size = 1) +
+  scale_color_manual(values = c("black", "red", "green", "blue", "purple", "orange")) +
+  labs(
+    title = bquote("X ~ N(" ~ mu ~ "," ~ sigma^2 == .(var) ~ ")"),
+    x = "x",
+    y = "Densidade",
+    color = expression(mu),
+    linetype = expression(mu)
+  ) +
+  theme_minimal() +
+  theme(legend.position = "right")
+```
+
+
+*Abaixo segue a integral da função densidade em todo seu domínio.*
+
+
+```{r norm2, exercise=TRUE, exercise.eval=TRUE}
+normal<-function(x,mu,sigma){
+  fdp=dnorm(x,mu,sigma)
+  return(fdp)
+}
+
+#Teste para ver se a integral da densidade é igual a 1.
+mu=1
+sigma=2
+integrand <- function(x){normal(x,mu,sigma)}
+integrate(integrand, lower = -Inf, upper = Inf)
+```
+
+```{r, echo=FALSE}
+Max <- 30
+Min <- -Max
+sliderInput("LimSupN", "Limite Superior do eixo x:" , min = 0  , max = Max, value = 8)
+sliderInput("muN", "Valor da Média:" , min = -5  , max = 5, value = 0)
+sliderInput("var", "Valor da Variância:", min = 0.1, max = 30, value = 4)
+sliderInput("XLegN", "Posição da Legenda:", min = Min, max = Max, value = -3)
+plotOutput("distPlotN")
+```
+
+
+```{r, context="server"}
+# Função para calcular a densidade da normal
+normal <- function(x, mu, sigma) {
+  dnorm(x, mu, sigma)
+}
+
+# Renderizando o gráfico no Shiny
+output$distPlotN <- renderPlot({
+  
+  # Definição do intervalo de x
+  x <- seq(-input$LimSupN, input$LimSupN, by = 0.01)
+
+  # Parâmetros das distribuições
+  muN <- input$muN
+  sigma <- sqrt(input$var)
+  var <- input$var
+
+  # Definição dos diferentes valores de média
+  mus <- c(muN, muN + 0.5, muN + 1, muN + 1.5, muN + 2, muN + 2.5)
+
+  # Criando o data frame para ggplot
+  df <- expand.grid(x = x, mu = mus) %>%
+    mutate(densidade = normal(x, mu, sigma))
+
+  # Definindo a posição da legenda
+  x_legend <- input$XLegN
+  y_legend <- 0.8 
+
+  # Criando o gráfico com ggplot2
+  ggplot(df, aes(x = x, y = densidade, color = factor(mu), linetype = factor(mu))) +
+    geom_line(size = 1) +
+    scale_color_manual(values = c("black", "red", "green", "blue", "purple", "orange")) +
+    annotate("text", x = x_legend, y = y_legend, label = "Legenda:", size = 5, fontface = "bold") + 
+    annotate("text", x = x_legend, y = y_legend - seq(0.05, length(mus) * 0.05, by = 0.05), 
+             label = paste0("N(", mus, ", ", var, ")"), 
+             color = c("black", "red", "green", "blue", "purple", "orange"),
+             size = 4, hjust = 0) +
+    ylim(0,1) + 
+    labs(
+      title = bquote("X ~ N(" ~ mu ~ "," ~ sigma^2 == .(var) ~ ")"),
+      x = "x",
+      y = "Densidade",
+      color = expression(mu),
+      linetype = expression(mu)
+    ) +
+    theme_minimal() +
+    theme(legend.position = "none")  # Remove a legenda automática para usar a manual
+})
+
+```
+
+## Distribuição Birnbaum-Saunders
+
+<p style="text-align: justify;">
+A **Distribuição Birnbaum-Saunders** é uma distribuição contínua, derivada de um modelo para fadiga que seguiu de considerações da teoria de renovação para o número de ciclos necessários para forçar uma extensão de trinca de fadiga a exceder um valor crítico. Foi desenvolvida por Z. W. Birnbaum e S. C. Saunders em 1969. \citet{birnbaum1969new}
+</p>
+
+Sua função densidade de probabilidade é dada por:
+
+\[
+f(t; \alpha, \beta)= \frac{1}{\sqrt{2 \pi} \alpha t}exp \left(- \frac{\left(\sqrt{\frac{t}{\beta}} - \sqrt{\frac{\beta}{t}}\right)^2}{\alpha^2} \right) , t>0,
+\]
+
+onde:
+
+$\alpha>0$ : parâmetro de forma (relacionado à dispersão dos dados).
+
+$\beta>0$ : parâmetro de escala (associado ao valor médio ou à localização central).
+
+&#10003; Parâmetros
+
+- $\alpha$: Controla a variação em torno do parâmetro de escala.
+- $\beta$: Tempo médio de falha.
+
+&#10003; Estatísticas Importantes
+    
+- Esperança: $\mathbb{E}[T] \approx \beta \left(1+ \frac{\alpha^2}{2} \right)$
+- Variância: \text{Var(T)} $\approx \beta^2 \alpha^2 \left( 1 + \frac{5 \alpha^2}{4} \right)$
+- Mediana: $= \beta$
+
+&#10003; Principais Aplicações
+
+- Modelagem do tempo até a falha de componentes ou sistemas mecânicos e eletrônicos.
+- Análise da resistência de materiais sujeitos a ciclos de carga repetitivos.
+- Aplicada em áreas como biologia, economia e finanças, quando os dados possuem assimetria positiva.
+
+
+### Representações Gráficas
+
+<p style="text-align: justify;">
+Notem que com a mudança de $\mu$, mantendo $\phi$ fixo, há uma alteração na média e na variança da variável aleatória com o aumento de $\mu$ há um aumento da média e da variança
+</p>
+
+```{r bs1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função de densidade da distribuição Birnbaum-Saunders
+bs <- function(t, mu, phi) {
+  ((exp(phi / 2) * sqrt(phi + 1)) / (4 * sqrt(pi * mu) * t^(3 / 2))) *
+    (t + ((phi * mu) / (phi + 1))) *
+    exp((-phi / 4) * ((t * (phi + 1) / (phi * mu)) + (phi * mu / (t * (phi + 1)))))
+}
+
+# Definição do intervalo de t
+t <- seq(0.5, 6, by = 0.01)
+
+# Parâmetros das distribuições
+mus <- c(1, 1.5, 2, 2.5, 3, 3.5)  # Valores de mu
+phi <- 100  # Valor fixo de phi para todas as distribuições
+
+# Criando o data frame para ggplot
+df <- expand.grid(t = t, mu = mus) %>%
+  mutate(densidade = bs(t, mu, phi))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = t, y = densidade, color = factor(mu), linetype = factor(mu))) +
+  geom_line(size = 1) +
+  scale_color_manual(values = c("black", "red", "green", "blue", "purple", "orange")) +
+  labs(
+    title = bquote("X ~ BS(" ~ mu ~ "," ~ phi == .(phi) ~ ")"),
+    x = "t",
+    y = "Densidade",
+    color = expression(mu),
+    linetype = expression(mu)
+  ) +
+  theme_minimal() +
+  theme(legend.position = c(0.75, 0.75))  # Posição dinâmica da legenda
+
+```
+
+
+*Abaixo segue a integral da função densidade em todo seu domínio.*
+
+
+```{r bs2, exercise=TRUE, exercise.eval=TRUE}
+bs<-function(t,mu,phi){
+  fdp=((exp(phi/2)*sqrt(phi+1))/(4*sqrt(pi*mu)*t^(3/2)))*(t+((phi*mu)/(phi+1)))*exp((-phi/4)*((t*(phi+1)/(phi*mu))+(phi*mu/(t*(phi+1)))))
+  return(fdp)
+}
+
+#Teste para ver se a integral da densidade é igual a 1.
+mu=1
+phi=2
+integrand <- function(t){bs(t,mu,phi)}
+integrate(integrand, lower = 0, upper = Inf)
+```
+
+```{r, echo=FALSE}
+sliderInput("LimSup", "Limite Superior do eixo x:" , min = 6  , max = 100, value = 1)
+sliderInput("mu1", "Valor de mu:" , min = 1  , max = 100, value = 1)
+sliderInput("phi", "Valor de phi:", min = 100, max = 500, value = 100)
+sliderInput("XLeg", "Posição da Legenda:", min = 1, max = 100, value = 3)
+plotOutput("distPlot")
+```
+
+
+```{r, context="server"}
+bs<-function(t,mu,phi){
+  fdp=((exp(phi/2)*sqrt(phi+1))/(4*sqrt(pi*mu)*t^(3/2)))*(t+((phi*mu)/(phi+1)))*exp((-phi/4)*((t*(phi+1)/(phi*mu))+(phi*mu/(t*(phi+1)))))
+  return(fdp)
+}
+
+output$distPlot <- renderPlot({
+  t=seq(0.5,input$LimSup,by=0.01)
+  mu1 <- input$mu1
+  phi1 <- input$phi
+  mu2 <- mu1+0.5
+  mu3 <- mu1+1
+  mu4 <- mu1+1.5
+  mu5 <- mu1+2
+  mu6 <- mu1+2.5
+  phi1 <- phi1
+  phi2 <- phi1
+  phi3 <- phi1
+  phi4 <- phi1
+  phi5 <- phi1
+  phi6 <- phi1
+  plot(t, bs(t,mu1,phi1), 
+     main=bquote("X~BS("~mu~","~phi~")"),
+     ylab='Densidade',
+     type='l',
+     lwd=2)
+  lines(t,bs(t,mu1+0.5,phi1),col=2,lty=2, lwd=2)
+  lines(t,bs(t,mu1+1  ,phi1),col=3,lty=2, lwd=2)
+  lines(t,bs(t,mu1+1.5,phi1),col=4,lty=2, lwd=2)
+  lines(t,bs(t,mu1+2  ,phi1),col=5,lty=2, lwd=2)
+  lines(t,bs(t,mu1+2.5,phi1),col=6,lty=2, lwd=2)
+  legend(input$XLeg, 0.8*max(bs(t,mu1,phi1)), c(bquote("BS(t," ~ mu== .(mu1) ~ "," ~ phi== .(phi1)~")"),
+                   bquote("BS(t," ~ mu== .(mu2) ~ "," ~ phi== .(phi2)~")"), 
+                   bquote("BS(t," ~ mu== .(mu3) ~ "," ~ phi== .(phi3)~")"), 
+                   bquote("BS(t," ~ mu== .(mu4) ~ "," ~ phi== .(phi4)~")"), 
+                   bquote("BS(t," ~ mu== .(mu5) ~ "," ~ phi== .(phi5)~")"), 
+                   bquote("BS(t," ~ mu== .(mu6) ~ "," ~ phi== .(phi6)~")")), 
+       fill=1:6)
+})
+```
+
+
+## Distribuição Beta
+
+<p style="text-align: justify;">
+A **Distribuição Beta** é uma distribuição de probabilidade contínua e suas aplicações incluem a modelagem de variáveis aleatórias que possuem um intervalo finito de $a$ a $b$. É uma distribuição frequentemente utilizada para proporções binomiais na análise bayesiana, para maiores informações ver \citet{forbes2011statistical}.
+</p>
+
+Sua função densidade de probabilidade é dada por:
+
+\[
+f(x; \alpha, \beta)= \frac{\Gamma(\alpha+ \beta)}{\Gamma(\alpha) \Gamma(\beta)}x^{\alpha-1}(1-x)^{\beta - 1},  0 \leq x \leq 1, 
+\]
+
+&#10003; Parâmetros
+
+- $\alpha$
+- $\beta$
+
+&#10003; Estatísticas Importantes
+
+- Esparança: $\mathbb{E}(X)= \frac{\alpha}{\alpha + \beta}$
+- Variância: $\text{Var(X)}= \frac{\alpha \beta}{(\alpha+ \beta)^2(\alpha+ \beta+1)}$
+- Moda: $~\text{Mo(X)}= \frac{\alpha - 1}{\alpha + \beta - 2}, ~\text{se}~ \alpha, \beta > 1$
+
+&#10003; Principais Aplicações
+
+- Representação de incertezas sobre frações ou probabilidades em diversas áreas.
+- Usada como distribuição a priori para parâmetros de distribuições binomiais.
+- Para análise de dados relativos a taxas de defeitos ou sucesso.
+- Representa proporções de sucesso em processos estocásticos.
+
+
+### Representações Gráficas 
+
+```{r beta1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Criando sequência de valores de x
+x <- seq(0, 1, by = 0.01)
+
+# Parâmetros da distribuição Beta
+alpha_values <- c(0.5, 2, 5, 2, 5, 2)
+beta_values <- c(0.5, 2, 5, 5, 2, 10)
+colors <- c("blue", "red", "green", "purple", "orange", "brown")
+
+# Definição manual da densidade da distribuição Beta
+beta_density <- function(x, alpha, beta) {
+  ifelse(x > 0 & x < 1, 
+         (gamma(alpha + beta) / (gamma(alpha) * gamma(beta))) * 
+           x^(alpha - 1) * (1 - x)^(beta - 1), 
+         0) # A densidade é zero fora do intervalo (0,1)
+}
+
+# Criando um dataframe com as densidades calculadas
+df <- expand.grid(x = x, id = 1:length(alpha_values)) %>%
+  mutate(alpha = alpha_values[id],
+         beta = beta_values[id],
+         density = beta_density(x, alpha, beta),
+         label = factor(paste0("Beta(", alpha, ", ", beta, ")")))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+  geom_line(linewidth = 1.2) +  # Ajuste para versões recentes do ggplot2
+  scale_color_manual(values = colors) +
+  labs(title = expression(X %~% Beta(alpha, beta)),
+       x = "x",
+       y = "Densidade",
+       color = "Distribuição",
+       linetype = "Distribuição") +
+  theme_minimal() +
+  theme(legend.position = "top")
+
+```
+
+```{r, echo=FALSE}
+#sidebarPanel(
+#  width = 10,  # Aumenta o tamanho do sidebar
+  #sliderInput("LimSupB", "Limite Superior do eixo y:" , min = 0.1  , max = 10, value = 5),
+  sliderInput("alphaB", "Valor de Alpha (shape1):" , min = 0.1  , max = 10, value = 2)#,
+  sliderInput("betaB", "Valor de Beta (shape2):" , min = 0.1  , max = 10, value = 2)#,
+  sliderInput("XLegB", "Posição da Legenda:", min = 0, max = 0.9, value = 0.6)
+#)
+#sidebarPanel(
+#      numericInput("alphaB", "Alpha:", 2, min = 0.1, step = 0.1),
+#      numericInput("betaB", "Beta:", 2, min = 0.1, step = 0.1),
+#      numericInput("LimSupB", "Limite Superior do Eixo Y:", 5, min = 1, step = 0.5),
+#      numericInput("XLegB", "Posição da Legenda (X):", 0.7, min = 0, max = 1, step = 0.1)
+#    )
+plotOutput("distPlotB")
+```
+
+
+```{r, context="server"}
+# Função manual para calcular a densidade da distribuição Beta
+beta_density <- function(x, alpha, beta) {
+  ifelse(x > 0 & x < 1, 
+         (gamma(alpha + beta) / (gamma(alpha) * gamma(beta))) * 
+         x^(alpha - 1) * (1 - x)^(beta - 1), 
+         0) # Fora do intervalo (0,1), a densidade é zero
+}
+
+output$distPlotB <- renderPlot({
+  # Valores de x para o gráfico
+  x <- seq(0, 1, by = 0.01)
+  
+  # Parâmetros
+  alphaB <- input$alphaB
+  betaB <- input$betaB
+  
+  # Criando um dataframe para armazenar os valores das densidades
+  df <- expand.grid(x = x, alpha_offset = seq(0, 2.5, by = 0.5)) %>%
+    mutate(alpha = alphaB + alpha_offset,
+           beta = betaB,
+           density = beta_density(x, alpha, beta),
+           label = factor(paste0("Beta(", alpha, ", ", beta, ")")))
+  
+  # Criando o gráfico com ggplot2
+  ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+    geom_line(linewidth = 1.2) +
+    scale_color_manual(values = c("black", "red", "blue", "green", "purple", "orange")) +
+    labs(title = bquote("X~"~"Beta("~alpha==.(alphaB)~","~beta==.(betaB)~")"),
+         x = "x",
+         y = "Densidade",
+         color = "Distribuição",
+         linetype = "Distribuição") +
+    theme_minimal() +
+    theme(
+      legend.position = c(input$XLegB, 0.5),  # Ajusta posição da legenda dinamicamente
+      legend.text = element_text(size = 14),  # Aumenta o tamanho do texto da legenda
+      legend.title = element_text(size = 16, face = "bold")  # Aumenta o título da legenda
+    ) +
+    ylim(0, 10)
+})
+``` 
+
+
+## Distribuição Cauchy
+
+<p style="text-align: justify;">
+A **Distribuição de Cauchy** é uma distribuição de probabilidade contínua caracterizada por sua forma simétrica e caudas longas. A distribuição foi introduzida por Augustin-Louis Cauchy em 1821 no contexto da teoria das funções complexas. É também conhecida como distribuição de Lorentz, devido à sua aplicação na física para descrever ressonâncias. Sua função densidade de probabilidade é dada por:
+</p>
+
+\[
+f(x;x_0,\gamma)= \frac{1}{\pi \gamma \left[ 1+ \left( \frac{x-x_0}{\gamma}\right)^{2}\right]}, - \infty < x < \infty,
+\]
+
+&#10003; Parâmetros
+
+- $x_0$: moda da distribuição
+- $\gamma$: Controla a dispersão dos dados ao redor de $x_0$
+
+&#10003; Estatísticas Importantes
+ 
+- Moda: A moda é $x_0$, o ponto onde a densidade atinge seu valor máximo
+- Mediana: A mediana também é $x_0$, pois a distribuição é simétrica.
+
+&#10003; Principais Aplicações
+
+- Descrever ressonâncias em sistemas oscilatórios.
+- Modelagem de ruído em sistemas de comunicação.
+- Utilizada em estudos para demonstrar falhas de estimadores.
+
+
+### Representações Gráficas
+
+```{r cauchy1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função para calcular a densidade da distribuição de Cauchy manualmente
+cauchy_density <- function(x, location, scale) {
+  (1 / (pi * scale)) * (1 / (1 + ((x - location) / scale)^2))
+}
+
+# Valores de x para o gráfico
+x <- seq(-10, 10, by = 0.01)
+
+# Parâmetros da distribuição de Cauchy
+locations <- c(0, 0, 0, 2, 2, -2)
+scales <- c(1, 2, 0.5, 1, 2, 1)
+colors <- c("blue", "red", "green", "purple", "orange", "brown")
+
+# Criando um dataframe com as densidades calculadas
+df <- expand.grid(x = x, id = 1:length(locations)) %>%
+  mutate(location = locations[id],
+         scale = scales[id],
+         density = cauchy_density(x, location, scale),
+         label = factor(paste0("Cauchy(", location, ", ", scale, ")")))
+
+# Criando a string dinâmica para o título usando bquote()
+title_bquote <- bquote(X %~% Cauchy(x[0] , gamma))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = colors) +
+  labs(title = title_bquote,  # Título dinâmico usando bquote()
+       x = "x",
+       y = "Densidade",
+       color = "Distribuição",
+       linetype = "Distribuição") +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 14),  # Aumenta o tamanho do texto da legenda
+    legend.title = element_text(size = 16, face = "bold")  # Aumenta o título da legenda
+  ) +
+  ylim(0, 1)
+```
+
+```{r, echo=FALSE}
+sliderInput("location", "Parâmetro x[0] (Locação):", min = -10, max = 10, value = 0, step = 0.5)
+sliderInput("scale", "Parâmetro gamma (Escala):", min = 0.1, max = 5, value = 1, step = 0.1)
+sliderInput("legendPos", "Posição da Legenda no eixo x:", min = 0, max = 0.9, value = 0.9, step = 0.1)
+plotOutput("distPlotCauchy")
+```
+
+```{r, context="server"}
+# Função manual para calcular a densidade da distribuição de Cauchy
+cauchy_density <- function(x, location, scale) {
+  (1 / (pi * scale)) * (1 / (1 + ((x - location) / scale)^2))
+}
+
+output$distPlotCauchy <- renderPlot({
+# Valores de x para o gráfico
+    x <- seq(-10, 10, by = 0.01)
+    
+    # Parâmetros da distribuição de Cauchy
+    locations <- c(input$location, input$location + 0.5, input$location + 1, 
+                   input$location + 1.5, input$location + 2, input$location + 2.5)
+    scales <- rep(input$scale, length(locations))
+    colors <- c("blue", "red", "green", "purple", "orange", "brown")
+
+    # Criando um dataframe com as densidades calculadas
+    df <- expand.grid(x = x, id = 1:length(locations)) %>%
+      mutate(location = locations[id],
+             scale = scales[id],
+             density = cauchy_density(x, location, scale),
+             label = factor(paste0("Cauchy(", location, ", ", scale, ")")))
+
+    # Criando o título dinâmico com bquote()
+    title_bquote <- bquote(X %~% Cauchy(x[0] == .(input$location), gamma == .(input$scale)))
+
+    # Criando o gráfico com ggplot2
+    ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+      geom_line(linewidth = 1.2) +
+      scale_color_manual(values = colors) +
+      labs(title = title_bquote,
+           x = "x",
+           y = "Densidade",
+           color = "Distribuição",
+           linetype = "Distribuição") +
+      theme_minimal() +
+      theme(
+        legend.position = c(input$legendPos, 0.7),
+        legend.text = element_text(size = 14),  # Aumenta o tamanho do texto da legenda
+        legend.title = element_text(size = 16, face = "bold")  # Aumenta o título da legenda
+      ) +
+      ylim(0, 2)
+})
+```
+
+## Distribuição Qui-quadrado
+
+<p style="text-align: justify;">
+A **Distribuição Qui-quadrado** é uma distribuição contínua e pode ser definida por ser a soma dos quadrados de um certo número de variáveis normais, por esse motivo, os valores da distribuição sempre serão maior que zero. Geralmente é usada para analisar variabilidade. Muito comum para analisar tabelas de contingências \citet{forbes2011statistical}. Sua definição matemática foi formalizada por Karl Pearson em 1900.
+</p>
+
+Sua função densidade de probabilidade é dada por:
+
+\[
+f(x;k)=\frac{1}{2^{\frac{k}{2}}\Gamma(\frac{k}{2})}x^{\frac{k}{2}-1}e^{-\frac{x}{2}}, x>0
+\]
+
+&#10003; Parâmetros
+
+- $k$: Número de graus de liberdade
+
+&#10003; Estatísticas Importantes
+ 
+- Esperança: $\mathbb{E}[X]=k$
+- Variância: \text{Var}$=2k$
+
+&#10003; Principais Aplicações
+
+- Teste de independência em tabelas de contingência.
+- Utilizada para verificação da variabilidade dos dados.
+- Estimativa de variâncias populacionais.
+
+
+### Representações Gráficas
+
+```{r quiquadrado1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função para calcular a densidade da distribuição Qui-Quadrado manualmente
+chisq_density <- function(x, df) {
+  ifelse(x > 0, (x^(df / 2 - 1) * exp(-x / 2)) / (2^(df / 2) * gamma(df / 2)), 0)
+}
+
+# Valores de x para o gráfico
+x <- seq(0, 20, by = 0.1)
+
+# Graus de liberdade para diferentes distribuições qui-quadrado
+df_values <- c(2, 4, 6, 8, 10, 15)
+colors <- c("blue", "red", "green", "purple", "orange", "brown")
+
+# Criando um dataframe com as densidades calculadas
+df <- expand.grid(x = x, df = df_values) %>%
+  mutate(density = chisq_density(x, df),
+         label = factor(paste0("Chi^2(", df, ")")))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = colors) +
+  labs(title = expression(X %~% chi^2(k)),
+       x = "x",
+       y = "Densidade",
+       color = "Graus de Liberdade",
+       linetype = "Graus de Liberdade") +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 14),  # Aumenta o tamanho do texto da legenda
+    legend.title = element_text(size = 16, face = "bold")  # Aumenta o título da legenda
+  ) +
+  ylim(0, 0.2)
+```
+
+```{r, echo=FALSE}
+sliderInput("df", "Graus de Liberdade (k):", min = 1, max = 20, value = 5, step = 1)
+sliderInput("legendPos", "Posição da Legenda no eixo x:", min = 0, max = 0.9, value = 0.8)
+plotOutput("distPlotChisq")
+```
+
+```{r, context="server"}
+# Função para calcular a densidade Qui-Quadrado manualmente
+chisq_density <- function(x, df) {
+  ifelse(x > 0, (x^(df / 2 - 1) * exp(-x / 2)) / (2^(df / 2) * gamma(df / 2)), 0)
+}
+
+output$distPlotChisq <- renderPlot({
+  # Valores de x para o gráfico
+  x <- seq(0, 20, by = 0.1)
+
+  # Garantindo que input$df tem um valor padrão
+  dynamic_df <- ifelse(is.null(input$df), 2, input$df)
+
+  # Calculando média e variância
+  mean_chisq <- dynamic_df
+  var_chisq <- 2 * dynamic_df
+
+  # Criando dataframe para a densidade dinâmica
+  df_dynamic <- data.frame(x = x, density = chisq_density(x, dynamic_df))
+
+  # Validando a posição da legenda
+  legend_position <- ifelse(input$legendPos %in% c("top", "bottom", "left", "right", "none"),
+                            input$legendPos, "top")
+
+  # Criando o gráfico com apenas uma curva
+  ggplot(df_dynamic, aes(x = x, y = density)) +
+    geom_line(color = "blue", linewidth = 1.2) +
+    labs(
+      title = bquote(X %~% chi^2 ~ (df == .(dynamic_df)) ~ "com" ~ E(X) == .(mean_chisq) ~ "e" ~ Var(X) == .(var_chisq)),
+      x = "x",
+      y = "Densidade"
+    ) +
+    theme_minimal() +
+    theme(
+      legend.position = legend_position,  # Usa apenas valores válidos
+      legend.text = element_text(size = 14),
+      legend.title = element_text(size = 16, face = "bold")
+    ) +
+    ylim(0, 1)
+})
+```
+
+## Distribuição Exponencial
+
+<p style="text-align: justify;">
+A **Distribuição Exponencial** é uma distribuição de probabilidade contínua que modela o tempo entre eventos em um processo de Poisson, onde os eventos ocorrem continuamente e independentemente a uma taxa constante. A formulação matemática da distribuição exponencial foi descoberta no século XIX, inicialmente como parte do trabalho de Siméon-Denis Poisson sobre a probabilidade de eventos raros. Posteriormente, foi formalizada como uma distribuição separada em estudos sobre confiabilidade e processos estocásticos. A função densidade de probabilidade é dada por:
+</p>
+
+\[
+f(x;\lambda)= \lambda e^{- \lambda x}, x \geq 0,
+\]
+
+
+&#10003; Parâmetros
+
+- $\lambda$: Taxa de ocorrência dos eventos
+
+&#10003; Estatísticas Importantes
+
+- $\mathbb{E}[X] =\frac{1}{\lambda}$
+- $\text{Var(X)} = \frac{1}{\lambda^2}$
+
+&#10003; Principais Aplicações
+
+- Modelagem de Tempo de Vida.
+- Modela o intervalo entre eventos consecutivos.
+
+
+### Representações Gráficas
+
+```{r exponencial1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função para calcular a densidade da distribuição exponencial manualmente
+exp_density <- function(x, rate) {
+  ifelse(x >= 0 & rate > 0, rate * exp(-rate * x), NA)  # Evita valores inválidos
+}
+
+# Valores de x para o gráfico
+x <- seq(0, 5, by = 0.01)
+
+# Taxas para diferentes distribuições exponenciais
+rate_values <- c(0.5, 1, 1.5, 2, 2.5)
+colors <- c("blue", "red", "green", "purple", "orange")
+
+# Criando dataframe com as densidades calculadas
+df <- expand.grid(x = x, rate = rate_values) %>%
+  mutate(density = exp_density(x, rate),
+         label = factor(paste0("Exponencial(", rate, ")")))
+
+# Criando o título dinâmico com bquote()
+title_bquote <- expression(X %~% Exponencial(lambda))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+  geom_line(linewidth = 1.2) +
+  scale_color_manual(values = colors) +
+  labs(
+    title = title_bquote,
+    x = "x",
+    y = "Densidade",
+    color = "Taxa (lambda)",
+    linetype = "Taxa (lambda)"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16, face = "bold")
+  ) +
+  ylim(0, 2.5)
+```
+
+```{r, echo=FALSE}
+sliderInput("rate", "Taxa (lambda):", min = 0.1, max = 10, value = 5, step = 0.1)
+sliderInput("legendPos", "Posição da Legenda no eixo x:", min = 0, max = 0.9, value = 0.8)
+plotOutput("distPlotExp")
+```
+
+```{r, context="server"}
+# Função para calcular a densidade da distribuição exponencial manualmente
+exp_density <- function(x, rate) {
+  ifelse(x >= 0 & rate > 0, rate * exp(-rate * x), NA)  # Evita valores inválidos
+}
+
+output$distPlotExp <- renderPlot({
+  # Valores de x para o gráfico
+  x <- seq(0, 5, by = 0.01)
+
+  # Garantindo que input$rate tem um valor válido
+  dynamic_rate <- ifelse(is.null(input$rate) | input$rate <= 0, 1, input$rate)
+
+  # Calculando média e variância
+  mean_exp <- 1 / dynamic_rate
+  var_exp <- 1 / (dynamic_rate^2)
+
+  # Criando dataframe para a densidade dinâmica
+  df_dynamic <- data.frame(x = x, density = exp_density(x, dynamic_rate))
+
+  # Remover valores NA antes de passar para o ggplot
+  df_dynamic <- df_dynamic %>% filter(!is.na(density))
+
+  # Criando o título dinâmico com bquote()
+  title_bquote <- bquote(X %~% Exponencial(lambda == .(dynamic_rate)) ~ "," ~ 
+                         E(X) == .(round(mean_exp, 2)) ~ "," ~ 
+                         Var(X) == .(round(var_exp, 2)))
+
+  # Ajustar dinamicamente o eixo y
+  ylim_max <- min(max(df_dynamic$density, na.rm = TRUE) + 0.1, 2.5)
+
+  # Criando o gráfico com apenas uma curva
+  ggplot(df_dynamic, aes(x = x, y = density)) +
+    geom_line(color = "blue", linewidth = 1.2, na.rm = TRUE) +  # Evita erro por NA
+    labs(
+      title = title_bquote,
+      x = "x",
+      y = "Densidade"
+    ) +
+    theme_minimal() +
+    ylim(0, ylim_max)  # Ajuste dinâmico do limite superior do eixo y
+})
+```
+
+## Distribuição Gama 
+
+<p style="text-align: justify;">
+A **Distribuição Gama** é uma distribuição de probabilidade contínua que modela o tempo até que ocorram $\alpha$ eventos em um processo de Poisson. A distribuição Gama foi formalizada no século XIX como parte dos estudos sobre funções especiais por matemáticos como Adrien-Marie Legendre e Carl Friedrich Gauss. Foi aplicada posteriormente por Karl Pearson no início do século XX para modelar dados biométricos e outros fenômenos. Sua função densidade de probabilidade é dada por:
+</p>
+
+\[
+f(x;\alpha,\beta)=\frac{\beta^{\alpha}}{\Gamma(\alpha)}x^{\alpha -1}e^{\beta x}, x>0,
+\]
+
+&#10003; Parâmetros
+
+- $\alpha:$Parâmetro de forma
+- $\beta:$Parâmetro de taxa
+
+&#10003; Estatísticas Importantes
+
+- $\mathbb{E}[X]=\frac{\alpha}{\beta}$
+- $\text{Var(X)}=\frac{\alpha}{\beta^2}$
+
+&#10003; Principais Aplicações
+
+- Modelagem de tempo de espera
+- Modelagem de precipitação acumulada em um intervalo de tempo
+
+
+### Representações Gráficas
+
+```{r gamma1, exercise=TRUE, exercise.eval=TRUE, fig.align='center'}
+# Função para calcular a densidade da distribuição Gama manualmente
+gamma_density <- function(x, shape, rate) {
+  ifelse(x >= 0, (rate^shape / gamma(shape)) * x^(shape - 1) * exp(-rate * x), NA)
+}
+
+# Valores de x para o gráfico
+x <- seq(0, 20, by = 0.1)
+
+# Parâmetros de forma e taxa para diferentes distribuições Gama
+shape_values <- c(1, 2, 3, 5, 7)
+rate_values <- c(0.5, 0.5, 1, 1, 1.5)
+
+# Ajustando o número de cores para corresponder ao número de distribuições
+colors <- rep(c("blue", "red", "green", "purple", "orange", "brown", "pink", "cyan", "black"), length.out = length(shape_values))
+
+# Criando dataframe com as densidades calculadas
+df <- expand.grid(x = x, id = 1:length(shape_values)) %>%
+  mutate(shape = shape_values[id],
+         rate = rate_values[id],
+         density = gamma_density(x, shape, rate),
+         label = factor(paste0("Gamma(", shape, ", ", rate, ")")))
+
+# Removendo valores NA antes de passar para o ggplot
+df <- df %>% filter(!is.na(density))
+
+# Ajustar dinamicamente o eixo y
+ylim_max <- max(df$density, na.rm = TRUE) + 0.02  # Evita remoção de valores por ylim fixo
+
+# Criando o título dinâmico com bquote()
+title_bquote <- expression(X %~% Gamma(alpha, beta))
+
+# Criando o gráfico com ggplot2
+ggplot(df, aes(x = x, y = density, color = label, linetype = label)) +
+  geom_line(linewidth = 1.2, na.rm = TRUE) +  # Evita erro por NA
+  scale_color_manual(values = colors) +  # Ajusta cores para evitar erro do `palette()`
+  labs(
+    title = title_bquote,
+    x = "x",
+    y = "Densidade",
+    color = "Parâmetros",
+    linetype = "Parâmetros"
+  ) +
+  theme_minimal() +
+  theme(
+    legend.position = "top",
+    legend.text = element_text(size = 14),
+    legend.title = element_text(size = 16, face = "bold")
+  ) +
+  ylim(0, ylim_max)  # Define o limite superior dinamicamente
+```
+
+
+```{r, echo=FALSE}
+sliderInput("shape", "Parâmetro α (Forma):", min = 0.5, max = 10, value = 2, step = 0.5)
+sliderInput("rate", "Parâmetro β (Taxa):", min = 0.1, max = 5, value = 1, step = 0.1)
+sliderInput("legendPos", "Posição da Legenda no eixo x:", min = 0, max = 1, value = 0.8, step = 0.1)
+plotOutput("distPlotGamma")
+```
+
+```{r, context="server"}
+output$distPlotGamma <- renderPlot({
+
+  # Função para calcular a densidade da distribuição Gama manualmente
+  gamma_density <- function(x, shape, rate) {
+    ifelse(x >= 0 & shape > 0 & rate > 0, 
+           (rate^shape / gamma(shape)) * x^(shape - 1) * exp(-rate * x), 
+           NA)
+  }
+
+  # Valores de x para o gráfico
+  x <- seq(0, 20, by = 0.1)
+
+  # Garantindo que os inputs não sejam nulos ou negativos
+  shape <- ifelse(is.null(input$shape) | input$shape <= 0, 1, input$shape)
+  rate <- ifelse(is.null(input$rate) | input$rate <= 0, 1, input$rate)
+
+  # Calculando média e variância
+  mean_gamma <- shape / rate
+  var_gamma <- shape / (rate^2)
+
+  # Criando dataframe para a densidade dinâmica
+  df_dynamic <- data.frame(x = x, density = gamma_density(x, shape, rate))
+
+  # Removendo valores NA antes de criar o gráfico
+  df_dynamic <- df_dynamic %>% filter(!is.na(density))
+
+  # Ajustar dinamicamente o eixo y para não cortar valores
+  ylim_max <- max(df_dynamic$density, na.rm = TRUE) + 0.02
+
+  # Criando o título dinâmico com `bquote()`
+  title_bquote <- bquote(
+    X %~% Gamma * phantom(" ") (alpha == .(shape), beta == .(rate)) ~ "," ~
+    E(X) == .(round(mean_gamma, 2)) ~ "," ~ Var(X) == .(round(var_gamma, 2))
+  )
+
+  # Criando o gráfico com ggplot2
+  ggplot(df_dynamic, aes(x = x, y = density)) +
+    geom_line(color = "blue", linewidth = 1.2, na.rm = TRUE) +  # Evita erro por NA
+    labs(
+      title = title_bquote,
+      x = "x",
+      y = "Densidade"
+    ) +
+    theme_minimal() +
+    ylim(0, ylim_max)  # Ajusta dinamicamente para não cortar a densidade
+})
+
+
+
+```
+
+
